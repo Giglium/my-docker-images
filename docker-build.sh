@@ -1,7 +1,7 @@
 #!/bin/sh
-#docker login -u $DOCKER_NAME -p $DOCKER_PASSWORD
+docker login -u $DOCKER_NAME -p $DOCKER_PASSWORD
 
-for directory in "$(find . -maxdepth 1 -mindepth 1 -type d -regex '\./[^\.].*')"; do
+for directory in $(find . -maxdepth 1 -mindepth 1 -type d -regex '\./[^\.].*'); do
 	if printf '%s\n' "$(git log -1 --pretty="" --name-only)" | grep -Fqe "$(basename "${directory}")"; then
 	  cd $(basename "${directory}")
   		export REPO=$DOCKER_NAME/$(basename "${directory}")
@@ -10,6 +10,8 @@ for directory in "$(find . -maxdepth 1 -mindepth 1 -type d -regex '\./[^\.].*')"
   		docker tag $REPO:$COMMIT $REPO:$TAG
   		docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
   		docker push $REPO
+
+      echo "pushed: " + $REPO
 		cd ..
 	fi
 done
